@@ -1,0 +1,21 @@
+import React from 'react';
+import { ActiveDirectoryChart, DASHBOARD_METRICS, DashboardLayout, DashboardToolbar, ExpandedWidget, MetricWidget, MfaChart, SelfServiceChart, ShortcutRail, WidgetFrame } from '../widgets/DashboardWidgets';
+
+const meta = { title:'Widgets/Dashboard', tags:['autodocs'], parameters:{layout:'fullscreen'} };
+export default meta;
+const pad = child => <div style={{padding:20,background:'#f7f8f8',minHeight:'100vh'}}>{child}</div>;
+export const DomainToolbar = { render:() => <DashboardToolbar/> };
+export const DashboardGrid = { render:() => <DashboardLayout metrics={DASHBOARD_METRICS.map(item => <MetricWidget key={item.title} {...item}/>)} charts={<WidgetFrame title="Active Directory Reports"><ActiveDirectoryChart/></WidgetFrame>} shortcuts={<ShortcutRail/>}/> };
+export const ExpandedChart = { render:() => <ExpandedWidget title="MFA Reports" onClose={()=>{}}><MfaChart/></ExpandedWidget> };
+export const SummaryCards = { render:() => pad(<div className="dash-metrics" style={{maxWidth:940,border:'1px solid #e6e9ea'}}>{DASHBOARD_METRICS.map(item => <MetricWidget key={item.title} {...item}/>)}</div>) };
+export const PasswordExpiration = { render:() => pad(<div style={{width:235}}><MetricWidget {...DASHBOARD_METRICS[0]}/></div>) };
+export const EnrollmentStatus = { render:() => pad(<div style={{width:235}}><MetricWidget {...DASHBOARD_METRICS[1]}/></div>) };
+export const LicenseUsage = { render:() => pad(<div style={{width:235}}><MetricWidget {...DASHBOARD_METRICS[2]}/></div>) };
+export const EndpointMfa = { render:() => pad(<div style={{width:235}}><MetricWidget {...DASHBOARD_METRICS[3]}/></div>) };
+export const ActiveDirectoryReportsChart = { render:() => pad(<div style={{width:468}}><WidgetFrame title="Active Directory Reports"><ActiveDirectoryChart/></WidgetFrame></div>) };
+export const MfaReportsChart = { render:() => pad(<div style={{width:468}}><WidgetFrame title="MFA Reports"><MfaChart/></WidgetFrame></div>) };
+export const PasswordSelfServiceReportsChart = { render:() => pad(<div style={{width:938}}><WidgetFrame title="Password Self-Service Reports"><SelfServiceChart/></WidgetFrame></div>) };
+export const FeatureShortcutRail = { render:() => pad(<div style={{width:295,border:'1px solid #e6e9ea'}}><ShortcutRail/></div>) };
+export const YourMetric = { args:{title:'Orders Today',value:'128',caption:'Across all stores',tone:'blue'}, render:args => pad(<div style={{width:250}}><MetricWidget {...args}/></div>) };
+export const YourChart = { args:{axisLabel:'Orders',max:100,data:[{id:'open',label:'Open',value:64,color:'#3b82f6'},{id:'closed',label:'Closed',value:28,color:'#22a06b'}]}, render:args => pad(<div style={{width:500}}><WidgetFrame title="Order Status"><ActiveDirectoryChart {...args}/></WidgetFrame></div>) };
+export const YourQuickLinks = { args:{groups:[{title:'Store Tools',links:[{id:'orders',label:'All Orders'},{id:'returns',label:'Returns'}]}]}, render:args => pad(<div style={{width:295}}><ShortcutRail {...args}/></div>) };

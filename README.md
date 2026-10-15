@@ -1,70 +1,96 @@
-# Getting Started with Create React App
+# ADSelfService Plus UI widget library
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React widget library and interactive reference implementation of the [ADSelfService Plus live demo](https://demo.adselfserviceplus.com/). It follows the reference's compact scale: a 69 px dark header, 244 px navigation rail, small form controls, flat panels, and green primary buttons. Icons use Lucide.
 
-## Available Scripts
+## Run
 
-In the project directory, you can run:
+```bash
+npm install
+npm start
+npm run storybook
+npm run build:lib
+```
 
-### `npm start`
+`npm run build` builds the demo; `npm run build-storybook` builds the component catalog. `npm run build:lib` creates the distributable package in `dist`. The application starts on Login Settings. Use the top navigation to open Dashboard, Reports, and Configuration.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Package entries
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+The root entry exports only reusable widgets and reference data. Full page compositions are a separate entry:
 
-### `npm test`
+```jsx
+import 'kiteapps-float/styles.css';
+import { AppShell, TopNavigation, CollapsibleSidebar, MetricWidget, MfaChart, ShortcutRail, ReportCategoryBar, ReportNavigation, PolicyTable } from 'kiteapps-float';
+import { DashboardPage, ReportsPage, ConfigurationPage, AdminScreen } from 'kiteapps-float/pages';
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Use your own content
 
-### `npm run build`
+The ADSelfService Plus text and counts are defaults for the demo. Pass your own labels, data, and callbacks to each widget or page:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```jsx
+import { ShoppingCart } from 'lucide-react';
+import 'kiteapps-float/styles.css';
+import { AppShell, MetricWidget, ReportNavigation, PolicyTable } from 'kiteapps-float';
+import { DashboardPage, ReportsPage } from 'kiteapps-float/pages';
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+const metrics = [
+  { id: 'orders', title: 'Orders Today', value: '128', caption: 'Across all stores', icon: ShoppingCart, report: 'daily' },
+];
+const reportGroups = [
+  { label: 'Sales Reports', items: [{ id: 'daily', label: 'Daily Sales' }] },
+];
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+<AppShell
+  activeSection="Dashboard"
+  hideSidebar
+  mainClassName="ad-main--dashboard"
+  headerProps={{
+    brand: 'Acme Console', sections: ['Dashboard', 'Reports'],
+    directories: ['Production', 'Staging'], showDownload: false,
+    utilityItems: [], showNotifications: false, showBrandOrbit: false,
+  }}
+  footerProps={{ items: [{ id: 'help', label: 'Help Center', href: '/help' }] }}
+>
+  <DashboardPage
+    metrics={metrics}
+    directoryData={[{ id: 'open', label: 'Open Orders', value: 64 }]}
+    mfaData={[{ id: 'web', label: 'Web', value: 70, color: '#3b82f6' }]}
+    selfServiceData={[{ id: 'returns', label: 'Returns', value: 12 }]}
+    shortcuts={[{ title: 'Store Tools', links: [{ id: 'inventory', label: 'Inventory' }] }]}
+    chartTitles={{ directory: 'Order Status', mfa: 'Sales Channels', selfService: 'Operations' }}
+    chartProps={{ directory: { max: 100, axisLabel: 'Orders' } }}
+    domains={['Production', 'Staging']}
+    onReportSelect={(reportId, item) => console.log(reportId, item)}
+    onShortcutSelect={(id, item) => console.log(id, item)}
+  />
+</AppShell>
+```
 
-### `npm run eject`
+`ReportNavigation`, `ReportCategoryBar`, and `ReportsPage` accept `groups={reportGroups}`. `ReportsPage` also accepts `filtersProps` for domain and OU choices, `labels` for text, and `onGenerate`, `onStop`, and `onSchedule` for actions. It manages report selection internally unless you pass `selected` and `onSelect`. The `onGenerate` callback receives `{ selected, report, domain, ou }`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+`ConfigurationPage` accepts custom `groups`, `policies` or `initialPolicies`, `features`, `columns`, `labels`, `onFeatureSelect`, and policy action callbacks. It manages policies locally unless you pass `policies` and `onPoliciesChange`. The toolbar searches and paginates the displayed rows; set `toolbarProps.pageSize` to change page size. `PolicyTable` accepts custom columns such as `{ key: 'owner', label: 'Owner' }`, with values read from each policy object. `DataTable` likewise accepts object columns, object rows, custom cell renderers, and `onRowClick`.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Every page imports its building blocks from the public widget entry, and the Storybook **Your…** and **Custom…** stories show the same prop patterns interactively. To use one piece without a full page, render it directly, for example `<MetricWidget title="Orders" value="128" caption="Today" onClick={openOrders} />`.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+`AdminScreen` is a reference page gallery. Pass `screens={{ myScreen: MySettingsPage }}` or `renderScreen={id => ...}` to supply your own page; build it from the exported form widgets such as `Frame`, `FormRow`, `CheckRow`, `InlineSelect`, `DataTable`, and `SaveBar`.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+For local package installation, run `npm pack` and install the resulting `.tgz` in the consuming project. React, React DOM, and Lucide React are peer dependencies. The library builds ESM and CommonJS files and includes CSS in the package. It has not been published to npm.
 
-## Learn More
+The Storybook catalog separates **Widgets** from **Pages**. Open **Widgets → Reusable Components** to find editable, interactive stories for PageHeader, DashboardToolbar, report navigation and filters, ShellHeader, TopNavigation, ShellFooter, AppShell, collapsible and configuration sidebars, policy features and tables, settings tabs, and InlineSelect. Each story has **Controls** for text and data props and a **Last action** readout for callback behavior. PolicyTable includes custom-column and empty-state variations. The Administrator screen stories remain under Administrator.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+| Widget | Content props | Action props |
+| --- | --- | --- |
+| `PageHeader` | `title`, `help`, `action` (React node) | Pass a callback to the action node, for example `<Button onClick={addUser}>` |
+| `DashboardToolbar` | `domains`, `domainLabel`, `menuItems` | `onDomainChange`, `onMenuAction`, `onToggleShortcuts`, `onExpand` |
+| `ReportNavigation`, `ReportCategoryBar` | `groups`, `selected` or `defaultSelected` | `onSelect(id, item)` |
+| `ReportFilters` | `domains`, `ouOptions`, `labels`, controlled `domain` and `ou` | `onDomainChange(value, item)`, `onOuChange(value, item)`, `onGenerate`, `onStop` |
+| `ShellHeader`, `TopNavigation`, `ShellFooter` | `brand`, `sections`, `directories`, `items` and labels | `onSectionChange`, `onDirectoryChange`, `onItemSelect` and utility callbacks |
+| `ConfigurationSidebar`, `PolicyFeatureStrip` | `groups`, `features`, `title`, `instruction` | `onSelect`, `onFeatureSelect` |
+| `PolicyTable`, `DataTable` | Object rows, columns, custom cell renderers, empty messages | `onEdit`, `onDelete`, `onCopy`, `onRowClick` |
+| `Frame`, `InlineSelect` | `tabs`, `title`, `options`, controlled or default values | `onTabChange`, `onChange` |
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Forms and report filters keep state locally when controlled values are omitted. Save shows a local confirmation and does not connect to ADSelfService Plus.
 
-### Code Splitting
+## Reference coverage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+The demo was inspected in its Administrator, Dashboard, Reports, and Configuration areas on October 14, 2026. Dashboard includes four summary cards, three report charts, the feature shortcut rail, and settings menu. Reports includes five category groups and their visible report names, searchable navigation, category menus, domain/OU filters, and result state. Configuration includes its collapsible navigation and Policy Configuration page with feature strip and policies table. Other Configuration selections currently show a generic settings panel. The displayed counts and policies are reference demo data. Some deeper tabs and configuration dialogs were unavailable in the demo; these examples use local interactions and representative content and should be checked against a working administrator installation before claiming pixel parity.
