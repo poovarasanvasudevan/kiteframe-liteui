@@ -1,4 +1,4 @@
-# ADSelfService Plus UI widget library
+# @kiteapps/lite-ui
 
 A React widget library and interactive reference implementation of the [ADSelfService Plus live demo](https://demo.adselfserviceplus.com/). It follows the reference's compact scale: a 69 px dark header, 244 px navigation rail, small form controls, flat panels, and green primary buttons. Icons use Lucide.
 
@@ -17,10 +17,14 @@ npm run build:lib
 
 The root entry exports only reusable widgets and reference data. Full page compositions are a separate entry:
 
+```bash
+npm install @kiteapps/lite-ui lucide-react
+```
+
 ```jsx
-import 'kiteapps-float/styles.css';
-import { AppShell, TopNavigation, CollapsibleSidebar, MetricWidget, MfaChart, ShortcutRail, ReportCategoryBar, ReportNavigation, PolicyTable } from 'kiteapps-float';
-import { DashboardPage, ReportsPage, ConfigurationPage, AdminScreen } from 'kiteapps-float/pages';
+import '@kiteapps/lite-ui/styles.css';
+import { AppShell, TopNavigation, CollapsibleSidebar, MetricWidget, MfaChart, ShortcutRail, ReportCategoryBar, ReportNavigation, PolicyTable } from '@kiteapps/lite-ui';
+import { DashboardPage, ReportsPage, ConfigurationPage, AdminScreen } from '@kiteapps/lite-ui/pages';
 ```
 
 ## Use your own content
@@ -29,9 +33,9 @@ The ADSelfService Plus text and counts are defaults for the demo. Pass your own 
 
 ```jsx
 import { ShoppingCart } from 'lucide-react';
-import 'kiteapps-float/styles.css';
-import { AppShell, MetricWidget, ReportNavigation, PolicyTable } from 'kiteapps-float';
-import { DashboardPage, ReportsPage } from 'kiteapps-float/pages';
+import '@kiteapps/lite-ui/styles.css';
+import { AppShell, MetricWidget, ReportNavigation, PolicyTable } from '@kiteapps/lite-ui';
+import { DashboardPage, ReportsPage } from '@kiteapps/lite-ui/pages';
 
 const metrics = [
   { id: 'orders', title: 'Orders Today', value: '128', caption: 'Across all stores', icon: ShoppingCart, report: 'daily' },
@@ -74,7 +78,22 @@ Every page imports its building blocks from the public widget entry, and the Sto
 
 `AdminScreen` is a reference page gallery. Pass `screens={{ myScreen: MySettingsPage }}` or `renderScreen={id => ...}` to supply your own page; build it from the exported form widgets such as `Frame`, `FormRow`, `CheckRow`, `InlineSelect`, `DataTable`, and `SaveBar`.
 
-For local package installation, run `npm pack` and install the resulting `.tgz` in the consuming project. React, React DOM, and Lucide React are peer dependencies. The library builds ESM and CommonJS files and includes CSS in the package. It has not been published to npm.
+For local package installation, run `npm pack` and install the resulting `.tgz` in the consuming project. React, React DOM, and Lucide React are peer dependencies. The library builds ESM and CommonJS files and includes CSS in the package.
+
+## Publish to npm
+
+The package name in `package.json` is `@kiteapps/lite-ui`. Sign in with an npm account that owns or has publish access to the `@kiteapps` scope. Choose and add the package's license before public release.
+
+```bash
+npm login
+npm whoami
+npm test -- --watch=false
+npm run build:lib
+npm pack --dry-run
+npm publish --access public
+```
+
+`prepack` also runs the library build when publishing. For a later release, update the version with `npm version patch` (or `minor`/`major`) before publishing again. See the [npm guide to scoped public packages](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/).
 
 The Storybook catalog separates **Widgets** from **Pages**. Open **Widgets → Reusable Components** to find editable, interactive stories for PageHeader, DashboardToolbar, report navigation and filters, ShellHeader, TopNavigation, ShellFooter, AppShell, collapsible and configuration sidebars, policy features and tables, settings tabs, and InlineSelect. Each story has **Controls** for text and data props and a **Last action** readout for callback behavior. PolicyTable includes custom-column and empty-state variations. The Administrator screen stories remain under Administrator.
 
