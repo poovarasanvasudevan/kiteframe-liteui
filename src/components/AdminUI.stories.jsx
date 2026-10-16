@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, Search } from 'lucide-react';
-import { ActionBar, Button, CheckRow, DataTable, FormRow, HelpTip, IconButton, Modal, Notice, PageHeader, Panel, RadioRow, SectionTitle, SelectField, Tabs, TextField, TextLink } from './AdminUI';
+import { ActionBar, Button, CheckRow, DataTable, FormRow, HelpTip, IconButton, Modal, Notice, PageHeader, Panel, RadioRow, SectionTitle, SelectField, Tabs, TextField, TextLink } from '../widgets';
 
 const meta = { title: 'Widgets/Primitives', tags: ['autodocs'], parameters: { layout: 'padded' } };
 export default meta;

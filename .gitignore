@@ -12,6 +12,8 @@
 /build
 /storybook-static
 /dist
+/storybook-dev.log
+/storybook-dev.err
 
 # misc
 .DS_Store

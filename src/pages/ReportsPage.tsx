@@ -1,10 +1,26 @@
-import React, { useState } from 'react';
-import { REPORT_GROUPS, normalizeReport, ReportCategoryBar, ReportFilters, ReportResults, ReportPageHeading } from '../widgets';
+import type * as React from 'react';
+import { useState } from 'react';
+import { REPORT_GROUPS, normalizeReport, ReportCategoryBar, ReportFilters, ReportResults, ReportPageHeading, type ReportGroup, type ReportItem, type ReportFiltersProps } from '../widgets';
 
-export function ReportsPage({ groups = REPORT_GROUPS, selected, defaultSelected, onSelect, filtersProps = {}, labels = {}, status: controlledStatus, onGenerate, onStop, onSchedule, results }) {
+export interface ReportGenerationContext { selected?: string; report?: ReportItem; domain?: string; ou?: string }
+export interface ReportsPageLabels { untitled?: string; schedule?: string; help?: string | null; scheduleNote?: string; empty?: string; loading?: string }
+export interface ReportsPageProps {
+  groups?: ReportGroup[];
+  selected?: string;
+  defaultSelected?: string;
+  onSelect?: (id: string, item: ReportItem) => void;
+  filtersProps?: ReportFiltersProps;
+  labels?: ReportsPageLabels;
+  status?: 'empty' | 'loading' | (string & {});
+  onGenerate?: (context: ReportGenerationContext) => void;
+  onStop?: () => void;
+  onSchedule?: (report?: ReportItem) => void;
+  results?: React.ReactNode;
+}
+export function ReportsPage({ groups = REPORT_GROUPS, selected, defaultSelected, onSelect, filtersProps = {}, labels = {}, status: controlledStatus, onGenerate, onStop, onSchedule, results }: ReportsPageProps) {
   const firstReport = groups[0]?.items[0] && normalizeReport(groups[0].items[0]);
   const [localSelected, setLocalSelected] = useState(defaultSelected ?? firstReport?.id);
-  const [localStatus, setLocalStatus] = useState('empty');
+  const [localStatus, setLocalStatus] = useState<'empty' | 'loading'>('empty');
   const [showSchedule, setShowSchedule] = useState(false);
   const [localDomain, setLocalDomain] = useState(filtersProps.defaultDomain ?? (typeof filtersProps.domains?.[0] === 'string' ? filtersProps.domains[0] : filtersProps.domains?.[0]?.value) ?? 'ADSELFSERVICE');
   const [localOu, setLocalOu] = useState(filtersProps.defaultOu ?? (typeof filtersProps.ouOptions?.[0] === 'string' ? filtersProps.ouOptions[0] : filtersProps.ouOptions?.[0]?.value) ?? 'All OU');
@@ -14,22 +30,16 @@ export function ReportsPage({ groups = REPORT_GROUPS, selected, defaultSelected,
   const status = controlledStatus ?? localStatus;
   const domain = filtersProps.domain ?? localDomain;
   const ou = filtersProps.ou ?? localOu;
-  const select = (id, item) => {
+  const select = (id: string, item: ReportItem) => {
     if (selected === undefined) setLocalSelected(id);
     onSelect?.(id, item);
     if (controlledStatus === undefined) setLocalStatus('empty');
   };
   const generate = () => {
     if (onGenerate) onGenerate({ selected: currentSelected, report, domain, ou });
-    else {
-      setLocalStatus('loading');
-      window.setTimeout(() => setLocalStatus('empty'), 650);
-    }
+    else { setLocalStatus('loading'); window.setTimeout(() => setLocalStatus('empty'), 650); }
   };
-  const stop = () => {
-    onStop?.();
-    if (controlledStatus === undefined) setLocalStatus('empty');
-  };
+  const stop = () => { onStop?.(); if (controlledStatus === undefined) setLocalStatus('empty'); };
   return <div className="reports-page">
     <ReportCategoryBar groups={groups} selected={currentSelected} onSelect={select}/>
     <div className="report-page-body">

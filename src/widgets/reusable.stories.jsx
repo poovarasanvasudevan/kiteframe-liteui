@@ -21,7 +21,7 @@ const policies = [
 ];
 
 const meta = {
-  title: 'Widgets/Reusable Components',
+  title: 'Widgets',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',

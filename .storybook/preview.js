@@ -6,7 +6,7 @@ export const parameters = {
   controls: { expanded: true },
   options: {
     storySort: {
-      order: ['Widgets', ['Reusable Components', 'Primitives', 'Dashboard', 'Reports', 'Shell', 'Configuration', 'Settings'], 'Pages', 'Administrator'],
+      order: ['Widgets', ['Primitives', 'Dashboard', 'Reports', 'Configuration', 'Shell', 'Settings'], 'Pages'],
     },
   },
 };

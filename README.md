@@ -8,23 +8,26 @@ A React widget library and interactive reference implementation of the [ADSelfSe
 npm install
 npm start
 npm run storybook
-npm run build:lib
+npm run build
 ```
 
-`npm run build` builds the demo; `npm run build-storybook` builds the component catalog. `npm run build:lib` creates the distributable package in `dist`. The application starts on Login Settings. Use the top navigation to open Dashboard, Reports, and Configuration.
+`npm run build` creates the distributable package in `dist`. `npm run build:demo` builds the standalone demo; `npm run build-storybook` builds the component catalog. The demo starts on Login Settings. Use the top navigation to open Dashboard, Reports, and Configuration.
 
 ## Package entries
 
-The root entry exports only reusable widgets and reference data. Full page compositions are a separate entry:
+The root entry exports every widget and page. Install the package and its peer dependencies in your React project:
 
 ```bash
-npm install @kiteapps/lite-ui lucide-react
+npm install @kiteapps/lite-ui react react-dom lucide-react
 ```
 
 ```jsx
 import '@kiteapps/lite-ui/styles.css';
-import { AppShell, TopNavigation, CollapsibleSidebar, MetricWidget, MfaChart, ShortcutRail, ReportCategoryBar, ReportNavigation, PolicyTable } from '@kiteapps/lite-ui';
-import { DashboardPage, ReportsPage, ConfigurationPage, AdminScreen } from '@kiteapps/lite-ui/pages';
+import {
+  AppShell, TopNavigation, CollapsibleSidebar, MetricWidget, MfaChart,
+  ShortcutRail, ReportCategoryBar, ReportNavigation, PolicyTable,
+  DashboardPage, ReportsPage, ConfigurationPage, AdminScreen,
+} from '@kiteapps/lite-ui';
 ```
 
 ## Use your own content
@@ -34,8 +37,7 @@ The ADSelfService Plus text and counts are defaults for the demo. Pass your own 
 ```jsx
 import { ShoppingCart } from 'lucide-react';
 import '@kiteapps/lite-ui/styles.css';
-import { AppShell, MetricWidget, ReportNavigation, PolicyTable } from '@kiteapps/lite-ui';
-import { DashboardPage, ReportsPage } from '@kiteapps/lite-ui/pages';
+import { AppShell, MetricWidget, ReportNavigation, PolicyTable, DashboardPage, ReportsPage } from '@kiteapps/lite-ui';
 
 const metrics = [
   { id: 'orders', title: 'Orders Today', value: '128', caption: 'Across all stores', icon: ShoppingCart, report: 'daily' },
@@ -74,11 +76,11 @@ const reportGroups = [
 
 `ConfigurationPage` accepts custom `groups`, `policies` or `initialPolicies`, `features`, `columns`, `labels`, `onFeatureSelect`, and policy action callbacks. It manages policies locally unless you pass `policies` and `onPoliciesChange`. The toolbar searches and paginates the displayed rows; set `toolbarProps.pageSize` to change page size. `PolicyTable` accepts custom columns such as `{ key: 'owner', label: 'Owner' }`, with values read from each policy object. `DataTable` likewise accepts object columns, object rows, custom cell renderers, and `onRowClick`.
 
-Every page imports its building blocks from the public widget entry, and the Storybook **Your…** and **Custom…** stories show the same prop patterns interactively. To use one piece without a full page, render it directly, for example `<MetricWidget title="Orders" value="128" caption="Today" onClick={openOrders} />`.
+Every page imports its building blocks from the public widget entry, and the Storybook **Widgets** and **Pages** stories show the same prop patterns interactively. To use one piece without a full page, render it directly, for example `<MetricWidget title="Orders" value="128" caption="Today" onClick={openOrders} />`.
 
 `AdminScreen` is a reference page gallery. Pass `screens={{ myScreen: MySettingsPage }}` or `renderScreen={id => ...}` to supply your own page; build it from the exported form widgets such as `Frame`, `FormRow`, `CheckRow`, `InlineSelect`, `DataTable`, and `SaveBar`.
 
-For local package installation, run `npm pack` and install the resulting `.tgz` in the consuming project. React, React DOM, and Lucide React are peer dependencies. The library builds ESM and CommonJS files and includes CSS in the package.
+For local package installation, run `npm pack` and install the resulting `.tgz` in the consuming project. React, React DOM, and Lucide React are peer dependencies. The library builds ESM and CommonJS files, TypeScript declarations, and CSS. Import the stylesheet once in your app. The `/pages` import path remains available for existing consumers.
 
 ## Publish to npm
 
@@ -95,7 +97,7 @@ npm publish --access public
 
 `prepack` also runs the library build when publishing. For a later release, update the version with `npm version patch` (or `minor`/`major`) before publishing again. See the [npm guide to scoped public packages](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/).
 
-The Storybook catalog separates **Widgets** from **Pages**. Open **Widgets → Reusable Components** to find editable, interactive stories for PageHeader, DashboardToolbar, report navigation and filters, ShellHeader, TopNavigation, ShellFooter, AppShell, collapsible and configuration sidebars, policy features and tables, settings tabs, and InlineSelect. Each story has **Controls** for text and data props and a **Last action** readout for callback behavior. PolicyTable includes custom-column and empty-state variations. The Administrator screen stories remain under Administrator.
+The Storybook catalog has only **Widgets** and **Pages**. Widgets contains editable, interactive stories for PageHeader, DashboardToolbar, report navigation and filters, ShellHeader, TopNavigation, ShellFooter, AppShell, collapsible and configuration sidebars, policy features and tables, settings tabs, and InlineSelect. Each story has **Controls** for text and data props and a **Last action** readout for callback behavior. PolicyTable includes custom-column and empty-state variations.
 
 | Widget | Content props | Action props |
 | --- | --- | --- |

@@ -6,7 +6,7 @@ import { DashboardPage } from './DashboardPage';
 import { ReportsPage } from './ReportsPage';
 import { ConfigurationPage } from './ConfigurationPage';
 
-const meta = { title:'Pages/Complete Screens', tags:['autodocs'], parameters:{layout:'fullscreen'} };
+const meta = { title:'Pages', tags:['autodocs'], parameters:{layout:'fullscreen'} };
 export default meta;
 export const Dashboard = { render:() => <AdminShell activeSection="Dashboard" hideSidebar mainClassName="ad-main--dashboard"><DashboardPage/></AdminShell> };
 export const Reports = { render:() => <ReportsStory/> };
