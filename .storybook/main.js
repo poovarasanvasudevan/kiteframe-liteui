@@ -1,7 +1,7 @@
 /** @type { import('@storybook/react-webpack5').StorybookConfig } */
 const config = {
   stories: [
-    '../src/components/AdminUI.stories.jsx',
+    '../src/components/ui/*.stories.jsx',
     '../src/dashboard/dashboard.stories.jsx',
     '../src/reports/reports.stories.jsx',
     '../src/widgets/*.stories.jsx',

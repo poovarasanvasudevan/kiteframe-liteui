@@ -1,6 +1,7 @@
 import type * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Bell, ChevronDown, ChevronRight, Download, Grid3X3, Search, Settings, UserRound } from 'lucide-react';
+import { Bell, BookOpen, ChevronDown, ChevronRight, Download, Grid3X3, Lightbulb, MessagesSquare, PhoneCall, Search, Send, Settings, UserRound } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Button } from './Primitives';
 
 export type NavigationSection = string | { id: string; label: string };
@@ -8,10 +9,20 @@ export interface NavigationItem { id: string; label: string }
 export interface NavigationGroup { id?: string; label: string; items: NavigationItem[] }
 export type DirectoryOption = string | { value: string; label: string };
 export type UtilityItem = string | { id?: string; label: string; onClick?: (item: Exclude<UtilityItem, string>) => void };
-export type FooterItem = string | { id: string; label: string; href?: string };
+export type FooterIconName = 'book' | 'lightbulb' | 'send' | 'messages' | 'phone';
+export interface FooterItemConfig { id: string; label: string; href?: string; icon?: FooterIconName | LucideIcon; iconColor?: string; iconSize?: number }
+export type FooterItem = string | FooterItemConfig;
 
 export const MAIN_SECTIONS: NavigationSection[] = ['Dashboard', 'Reports', 'Configuration', 'Admin', 'Support'];
-export const FOOTER_LINKS: FooterItem[] = ['Admin Guide', 'Need Features', 'Report an Issue', 'User Forums', 'Toll free : +1-844-245-1104', 'Direct Phone : +1-408-916-9890'];
+export const FOOTER_LINKS: FooterItem[] = [
+  { id: 'guide', label: 'Admin Guide', icon: 'book', iconColor: '#3188b5', iconSize: 12 },
+  { id: 'features', label: 'Need Features', icon: 'lightbulb', iconColor: '#529d73', iconSize: 12 },
+  { id: 'issue', label: 'Report an Issue', icon: 'send', iconColor: '#e67860', iconSize: 12 },
+  { id: 'forums', label: 'User Forums', icon: 'messages', iconColor: '#dc7274', iconSize: 12 },
+  { id: 'toll-free', label: 'Toll free : +1-844-245-1104', icon: 'phone', iconColor: '#74a746', iconSize: 12 },
+  { id: 'direct-phone', label: 'Direct Phone : +1-408-916-9890', icon: 'phone', iconColor: '#74a746', iconSize: 12 },
+];
+const FOOTER_ICONS: Record<FooterIconName, LucideIcon> = { book: BookOpen, lightbulb: Lightbulb, send: Send, messages: MessagesSquare, phone: PhoneCall };
 
 export interface TopNavigationProps {
   sections?: NavigationSection[];
@@ -95,9 +106,14 @@ export function CollapsibleSidebar({ groups = [], selected, defaultSelected, onS
   return <nav aria-label={ariaLabel}>{groups.map(group => <div className="ad-nav-group" key={group.id ?? group.label}><button type="button" className="ad-nav-heading" onClick={() => { const next = expanded === group.label ? '' : group.label; if (open === undefined) setOpenGroup(next); onOpenChange?.(next,group); }} aria-expanded={expanded === group.label}>{group.label}{expanded === group.label ? <ChevronDown size={12}/> : <ChevronRight size={12}/>}</button>{expanded === group.label && <div className="ad-nav-items">{group.items.map(item => <button type="button" key={item.id} className={`ad-nav-item ${currentSelected === item.id ? 'is-active' : ''}`} aria-current={currentSelected === item.id ? 'page' : undefined} onClick={() => { if (selected === undefined) setLocalSelected(item.id); onSelect?.(item.id,item); }}>{item.label}</button>)}</div>}</div>)}</nav>;
 }
 
-export interface ShellFooterProps { items?: FooterItem[]; onItemSelect?: (id: string, item: { id: string; label: string; href?: string }) => void; children?: React.ReactNode }
+export interface ShellFooterProps { items?: FooterItem[]; onItemSelect?: (id: string, item: FooterItemConfig) => void; children?: React.ReactNode }
 export function ShellFooter({ items = FOOTER_LINKS, onItemSelect, children }: ShellFooterProps) {
-  return <footer className="ad-footer">{items.map((raw,index) => { const item = typeof raw === 'string' ? { id: raw, label: raw } : raw; return item.href ? <a key={item.id ?? index} href={item.href}>{item.label}</a> : <button type="button" key={item.id ?? index} onClick={() => onItemSelect?.(item.id,item)}>{item.label}</button>; })}{children}</footer>;
+  return <footer className="ad-footer">{items.map((raw,index) => {
+    const item: FooterItemConfig = typeof raw === 'string' ? { id: raw, label: raw } : raw;
+    const Icon = typeof item.icon === 'string' ? FOOTER_ICONS[item.icon] : item.icon;
+    const content = <>{Icon && <Icon className="ad-footer-icon" aria-hidden="true" size={item.iconSize ?? 12} color={item.iconColor}/>}<span className="ad-footer-item-label">{item.label}</span></>;
+    return item.href ? <a className="ad-footer-item" key={item.id ?? index} href={item.href}>{content}</a> : <button className="ad-footer-item" type="button" key={item.id ?? index} onClick={() => onItemSelect?.(item.id,item)}>{content}</button>;
+  })}{children}</footer>;
 }
 
 export interface AppShellProps {

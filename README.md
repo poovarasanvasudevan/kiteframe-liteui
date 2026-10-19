@@ -1,117 +1,98 @@
 # @kiteapps/lite-ui
 
-A React widget library and interactive reference implementation of the [ADSelfService Plus live demo](https://demo.adselfserviceplus.com/). It follows the reference's compact scale: a 69 px dark header, 244 px navigation rail, small form controls, flat panels, and green primary buttons. Icons use Lucide.
+Compact React components modeled on the [ADSelfService Plus administrator demo](https://demo.adselfserviceplus.com/). The package contains individual controls, larger administrator widgets, and example pages. The demo content is illustrative; the components accept your own data and callbacks.
 
-## Run
-
-```bash
-npm install
-npm start
-npm run storybook
-npm run build
-```
-
-`npm run build` creates the distributable package in `dist`. `npm run build:demo` builds the standalone demo; `npm run build-storybook` builds the component catalog. The demo starts on Login Settings. Use the top navigation to open Dashboard, Reports, and Configuration.
-
-## Package entries
-
-The root entry exports every widget and page. Install the package and its peer dependencies in your React project:
+## Develop
 
 ```bash
-npm install @kiteapps/lite-ui react react-dom lucide-react
-```
-
-```jsx
-import '@kiteapps/lite-ui/styles.css';
-import {
-  AppShell, TopNavigation, CollapsibleSidebar, MetricWidget, MfaChart,
-  ShortcutRail, ReportCategoryBar, ReportNavigation, PolicyTable,
-  DashboardPage, ReportsPage, ConfigurationPage, AdminScreen,
-} from '@kiteapps/lite-ui';
-```
-
-## Use your own content
-
-The ADSelfService Plus text and counts are defaults for the demo. Pass your own labels, data, and callbacks to each widget or page:
-
-```jsx
-import { ShoppingCart } from 'lucide-react';
-import '@kiteapps/lite-ui/styles.css';
-import { AppShell, MetricWidget, ReportNavigation, PolicyTable, DashboardPage, ReportsPage } from '@kiteapps/lite-ui';
-
-const metrics = [
-  { id: 'orders', title: 'Orders Today', value: '128', caption: 'Across all stores', icon: ShoppingCart, report: 'daily' },
-];
-const reportGroups = [
-  { label: 'Sales Reports', items: [{ id: 'daily', label: 'Daily Sales' }] },
-];
-
-<AppShell
-  activeSection="Dashboard"
-  hideSidebar
-  mainClassName="ad-main--dashboard"
-  headerProps={{
-    brand: 'Acme Console', sections: ['Dashboard', 'Reports'],
-    directories: ['Production', 'Staging'], showDownload: false,
-    utilityItems: [], showNotifications: false, showBrandOrbit: false,
-  }}
-  footerProps={{ items: [{ id: 'help', label: 'Help Center', href: '/help' }] }}
->
-  <DashboardPage
-    metrics={metrics}
-    directoryData={[{ id: 'open', label: 'Open Orders', value: 64 }]}
-    mfaData={[{ id: 'web', label: 'Web', value: 70, color: '#3b82f6' }]}
-    selfServiceData={[{ id: 'returns', label: 'Returns', value: 12 }]}
-    shortcuts={[{ title: 'Store Tools', links: [{ id: 'inventory', label: 'Inventory' }] }]}
-    chartTitles={{ directory: 'Order Status', mfa: 'Sales Channels', selfService: 'Operations' }}
-    chartProps={{ directory: { max: 100, axisLabel: 'Orders' } }}
-    domains={['Production', 'Staging']}
-    onReportSelect={(reportId, item) => console.log(reportId, item)}
-    onShortcutSelect={(id, item) => console.log(id, item)}
-  />
-</AppShell>
-```
-
-`ReportNavigation`, `ReportCategoryBar`, and `ReportsPage` accept `groups={reportGroups}`. `ReportsPage` also accepts `filtersProps` for domain and OU choices, `labels` for text, and `onGenerate`, `onStop`, and `onSchedule` for actions. It manages report selection internally unless you pass `selected` and `onSelect`. The `onGenerate` callback receives `{ selected, report, domain, ou }`.
-
-`ConfigurationPage` accepts custom `groups`, `policies` or `initialPolicies`, `features`, `columns`, `labels`, `onFeatureSelect`, and policy action callbacks. It manages policies locally unless you pass `policies` and `onPoliciesChange`. The toolbar searches and paginates the displayed rows; set `toolbarProps.pageSize` to change page size. `PolicyTable` accepts custom columns such as `{ key: 'owner', label: 'Owner' }`, with values read from each policy object. `DataTable` likewise accepts object columns, object rows, custom cell renderers, and `onRowClick`.
-
-Every page imports its building blocks from the public widget entry, and the Storybook **Widgets** and **Pages** stories show the same prop patterns interactively. To use one piece without a full page, render it directly, for example `<MetricWidget title="Orders" value="128" caption="Today" onClick={openOrders} />`.
-
-`AdminScreen` is a reference page gallery. Pass `screens={{ myScreen: MySettingsPage }}` or `renderScreen={id => ...}` to supply your own page; build it from the exported form widgets such as `Frame`, `FormRow`, `CheckRow`, `InlineSelect`, `DataTable`, and `SaveBar`.
-
-For local package installation, run `npm pack` and install the resulting `.tgz` in the consuming project. React, React DOM, and Lucide React are peer dependencies. The library builds ESM and CommonJS files, TypeScript declarations, and CSS. Import the stylesheet once in your app. The `/pages` import path remains available for existing consumers.
-
-## Publish to npm
-
-The package name in `package.json` is `@kiteapps/lite-ui`. Sign in with an npm account that owns or has publish access to the `@kiteapps` scope. Choose and add the package's license before public release.
-
-```bash
-npm login
-npm whoami
+npm ci
+npm run storybook       # component catalog at http://localhost:6006
+npm run typecheck
 npm test -- --watch=false
-npm run build:lib
-npm pack --dry-run
-npm publish --access public
+npm run build           # distributable package in dist/
+npm run build-storybook # static Storybook in storybook-static/
 ```
 
-`prepack` also runs the library build when publishing. For a later release, update the version with `npm version patch` (or `minor`/`major`) before publishing again. See the [npm guide to scoped public packages](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/).
+Storybook is organized as **Components** (individual controls), **Widgets** (one editable story for each Dashboard, Reports, Configuration, Settings, and Shell widget), **Examples** (compositions), and **Pages** (reference screens). Open a story's **Controls** panel to change its props. Open **Docs → Show code** for a usage example. To change the example itself, edit its `*.stories.jsx` file; Storybook reloads it during development.
 
-The Storybook catalog has only **Widgets** and **Pages**. Widgets contains editable, interactive stories for PageHeader, DashboardToolbar, report navigation and filters, ShellHeader, TopNavigation, ShellFooter, AppShell, collapsible and configuration sidebars, policy features and tables, settings tabs, and InlineSelect. Each story has **Controls** for text and data props and a **Last action** readout for callback behavior. PolicyTable includes custom-column and empty-state variations.
+## Use in another React app
 
-| Widget | Content props | Action props |
-| --- | --- | --- |
-| `PageHeader` | `title`, `help`, `action` (React node) | Pass a callback to the action node, for example `<Button onClick={addUser}>` |
-| `DashboardToolbar` | `domains`, `domainLabel`, `menuItems` | `onDomainChange`, `onMenuAction`, `onToggleShortcuts`, `onExpand` |
-| `ReportNavigation`, `ReportCategoryBar` | `groups`, `selected` or `defaultSelected` | `onSelect(id, item)` |
-| `ReportFilters` | `domains`, `ouOptions`, `labels`, controlled `domain` and `ou` | `onDomainChange(value, item)`, `onOuChange(value, item)`, `onGenerate`, `onStop` |
-| `ShellHeader`, `TopNavigation`, `ShellFooter` | `brand`, `sections`, `directories`, `items` and labels | `onSectionChange`, `onDirectoryChange`, `onItemSelect` and utility callbacks |
-| `ConfigurationSidebar`, `PolicyFeatureStrip` | `groups`, `features`, `title`, `instruction` | `onSelect`, `onFeatureSelect` |
-| `PolicyTable`, `DataTable` | Object rows, columns, custom cell renderers, empty messages | `onEdit`, `onDelete`, `onCopy`, `onRowClick` |
-| `Frame`, `InlineSelect` | `tabs`, `title`, `options`, controlled or default values | `onTabChange`, `onChange` |
+Install `@kiteapps/lite-ui`, React, React DOM, and Lucide React. Import the stylesheet once:
 
-Forms and report filters keep state locally when controlled values are omitted. Save shows a local confirmation and does not connect to ADSelfService Plus.
+```jsx
+import '@kiteapps/lite-ui/styles.css';
+import { Button, TextField, CheckRow, Tabs, DataTable, Modal } from '@kiteapps/lite-ui';
+
+const columns = [
+  { key: 'name', label: 'Policy' },
+  { key: 'domain', label: 'Directory' },
+];
+
+function PolicyList({ policies, onOpen }) {
+  return <>
+    <TextField label="Find a policy" placeholder="Search policies" />
+    <DataTable columns={columns} rows={policies} onRowClick={onOpen} empty="No policies found" />
+    <Button variant="primary" onClick={() => onOpen(null)}>Add policy</Button>
+  </>;
+}
+```
+
+The public root entry exports every control and widget by name. Controls are maintained in `src/components/ui/`, one module per component family. `src/widgets/Primitives.tsx` re-exports them so existing source imports continue to work. `src/widgets/` contains composed widgets, while `src/pages/` contains reference pages. The demo uses these same exports.
+
+Controls support normal React props. For example, `TextField` forwards native input attributes and accepts `label`, `hint`, and `error`; `CheckRow` and `Tabs` can be controlled or manage local state. `DataTable` takes object rows and column definitions, including an optional `render(row, index)` for a cell. `Modal` takes `open`, `onClose`, `title`, and optional `footer`. The Storybook Docs tab has a working usage snippet for each core control.
+
+`TextArea` is the multiline companion to `TextField`. It forwards native textarea props such as `rows`, `value`, `defaultValue`, `onChange`, `name`, and `disabled`, and uses the same `label`, `hint`, and `error` props. It also works inside `FormField` for schema validation.
+
+`TextField`, `TextArea`, and `SelectField` accept `helpText`. When provided, a question-mark button appears beside the label and reveals the help text on click or keyboard activation. `hint` stays visible below the input; `helpText` stays hidden until requested.
+
+`TagInput` accepts `value` and `onChange` for controlled tags, or `defaultValue` for local state. Press Enter or comma to add a tag; Backspace removes the last tag when the input is empty. It also supports `maxTags`, `allowDuplicates`, `addOnBlur`, `hint`, and `error`.
+
+`PasswordInput` works like `TextField` and adds an eye button to show or hide the password. Visibility can be controlled with `visible` and `onVisibilityChange`, or managed locally with `defaultVisible`.
+
+`Switch` is a native checkbox with switch semantics and optional `label` and `description`. Use `checked` and a boolean `onChange` callback for controlled state, or `defaultChecked` for native local state. It supports `sm` and `md` sizes plus standard input props such as `name`, `value`, and `disabled`.
+
+`ButtonGroup` presents a single choice as connected buttons backed by native radio inputs. Pass string options or `{ value, label, disabled }` objects, plus `ariaLabel` to name the group. Use `value` and `onChange` for controlled selection, or `defaultValue` for local selection. `name` and `required` support HTML forms, and `disabled` disables the full group.
+
+## Validated forms
+
+`Form` and `FormField` connect the library's controls to [React Hook Form](https://react-hook-form.com/) and schema validation. Install the peer dependency and the compatible Zod resolver used by the examples:
+
+```sh
+npm install react-hook-form@^7.90.0 @hookform/resolvers@4.1.3 zod@3.24.4
+```
+
+```jsx
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button, Form, FormField, TextField } from '@kiteapps/lite-ui';
+
+const schema = z.object({ server: z.string().trim().min(1, 'Enter a server name') });
+
+function ServerSettings({ onSave }) {
+  const methods = useForm({
+    resolver: zodResolver(schema),
+    defaultValues: { server: '' },
+    mode: 'onBlur',
+  });
+
+  return <Form form={methods} onSubmit={onSave}>
+    <FormField control={methods.control} name="server" label="Server name" required render={({ field, inputProps }) =>
+      <TextField {...field} {...inputProps} placeholder="server.example.com" />
+    } />
+    <Button type="submit" variant="primary">Save settings</Button>
+  </Form>;
+}
+```
+
+`FormField` supplies a linked label, hint, error message, and accessibility props through `inputProps`. Pass `control` for TypeScript field-name inference; inside `Form`, it can also read the control from context. The same render prop works with `PasswordInput` and `SelectField`. For `Switch` and `TagInput`, pass `field.value` to `checked` or `value` and `field.onChange` to `onChange`; the Components/Form playground in Storybook shows each control. `FormRow` also accepts `htmlFor`, `hint`, and `error` without a form provider. Its `required` marker is visual; put the validation rule in the schema.
+
+`ShellFooter` items accept an `icon` name (`book`, `lightbulb`, `send`, `messages`, or `phone`) or a Lucide icon component. Set `iconColor` and `iconSize` on each item; the ShellFooter story exposes these fields in Controls. For example: `<ShellFooter items={[{ id: 'guide', label: 'Admin Guide', icon: 'book', iconColor: '#3188b5', iconSize: 14 }]} />`.
+
+## Design tokens and styling
+
+Import `@kiteapps/lite-ui/styles.css` once. The reference palette and scale live in `src/components/admin-ui.css` using `--ad-*` CSS variables. Components use the `ad-` class prefix so they can be composed outside the demo app. Pass `className` to the controls that expose it for local layout changes.
 
 ## Reference coverage
 
-The demo was inspected in its Administrator, Dashboard, Reports, and Configuration areas on October 14, 2026. Dashboard includes four summary cards, three report charts, the feature shortcut rail, and settings menu. Reports includes five category groups and their visible report names, searchable navigation, category menus, domain/OU filters, and result state. Configuration includes its collapsible navigation and Policy Configuration page with feature strip and policies table. Other Configuration selections currently show a generic settings panel. The displayed counts and policies are reference demo data. Some deeper tabs and configuration dialogs were unavailable in the demo; these examples use local interactions and representative content and should be checked against a working administrator installation before claiming pixel parity.
+The current example app covers the administrator shell, Dashboard, Reports, Configuration, and several Admin settings screens. It reproduces reusable interaction patterns from the public demo rather than connecting to ADSelfService Plus. Values and save confirmations are local example data. Additional reference screens can be built from the exported components and added as independent Storybook stories.

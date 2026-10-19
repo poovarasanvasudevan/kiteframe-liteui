@@ -21,11 +21,11 @@ const policies = [
 ];
 
 const meta = {
-  title: 'Widgets',
+  title: 'Examples/Compositions',
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
-    docs: { description: { component: 'Edit the Args controls to change content. Use the controls in each preview to see callbacks and state changes. Import these components from kiteapps-float.' } },
+    docs: { description: { component: 'Examples of composing the public widgets with caller supplied content and callbacks. The Components section documents the individual controls.' } },
   },
 };
 export default meta;
@@ -131,7 +131,7 @@ function TopNavigationDemo(args) {
 
 export const ShellFooterWidget = {
   name: 'ShellFooter',
-  args: { items: [{ id: 'help', label: 'Help Center' }, { id: 'feedback', label: 'Send Feedback' }] },
+  args: { items: [{ id: 'help', label: 'Help Center', icon: 'book', iconColor: '#3188b5', iconSize: 14 }, { id: 'feedback', label: 'Send Feedback', icon: 'send', iconColor: '#e67860', iconSize: 12 }] },
   render: args => <ShellFooterDemo {...args}/>,
 };
 function ShellFooterDemo(args) {

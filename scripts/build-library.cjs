@@ -5,7 +5,7 @@ const { execFileSync } = require('child_process');
 
 const root = path.resolve(__dirname, '..');
 const outdir = path.join(root, 'dist');
-const external = ['react', 'react-dom', 'lucide-react'];
+const external = ['react', 'react-dom', 'lucide-react', 'react-hook-form'];
 
 async function build() {
   if (path.dirname(outdir) !== root || path.basename(outdir) !== 'dist') {

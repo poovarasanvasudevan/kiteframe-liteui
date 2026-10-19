@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { AppShell, CollapsibleSidebar, DashboardToolbar, ReportNavigation, ReportFilters, PolicyTable, ShortcutRail, Frame, DataTable } from './index';
+import { AppShell, CollapsibleSidebar, DashboardToolbar, ReportNavigation, ReportFilters, ReportPageHeading, PolicyTable, ShortcutRail, Frame, DataTable, ShellFooter } from './index';
 import { DashboardPage, ReportsPage, ConfigurationPage } from '../pages';
 
 test('shell and sidebar use caller supplied labels and actions', () => {
@@ -15,6 +15,18 @@ test('shell and sidebar use caller supplied labels and actions', () => {
   expect(onSelect).toHaveBeenCalledWith('customers',expect.objectContaining({label:'Customers'}));
   fireEvent.click(screen.getByRole('button',{name:'Help center'}));
   expect(onSelect).toHaveBeenCalledWith('help',expect.objectContaining({label:'Help center'}));
+});
+
+test('footer items render editable icon size and color without changing their action', () => {
+  const onItemSelect = jest.fn();
+  render(<ShellFooter items={[{ id: 'guide', label: 'Admin Guide', icon: 'book', iconColor: '#3188b5', iconSize: 18 }]} onItemSelect={onItemSelect}/>);
+  const item = screen.getByRole('button', { name: 'Admin Guide' });
+  const icon = item.querySelector('svg');
+  expect(icon).toHaveAttribute('width', '18');
+  expect(icon).toHaveAttribute('height', '18');
+  expect(icon).toHaveAttribute('stroke', '#3188b5');
+  fireEvent.click(item);
+  expect(onItemSelect).toHaveBeenCalledWith('guide', expect.objectContaining({ icon: 'book', iconSize: 18 }));
 });
 
 test('dashboard accepts custom metrics, charts, domains and shortcuts', () => {
@@ -42,6 +54,15 @@ test('reports use caller supplied groups, filters, labels and actions', () => {
   fireEvent.click(screen.getByRole('button',{name:'Run Report'}));
   expect(onGenerate).toHaveBeenCalledWith(expect.objectContaining({selected:'revenue',report:expect.objectContaining({label:'Revenue Report'})}));
   expect(screen.getByLabelText('Region')).toHaveValue('West');
+});
+
+test('report heading accepts a schedule icon and keeps the schedule action', () => {
+  const onSchedule = jest.fn();
+  render(<ReportPageHeading title="Locked out users" scheduleIcon="calendarDays" scheduleLabel="Schedule report" onSchedule={onSchedule}/>);
+  const schedule = screen.getByRole('button', { name: 'Schedule report' });
+  expect(schedule.querySelector('.lucide-calendar-days')).toBeInTheDocument();
+  fireEvent.click(schedule);
+  expect(onSchedule).toHaveBeenCalledTimes(1);
 });
 
 test('report navigation, filters, policy columns and configuration content can be replaced', () => {
